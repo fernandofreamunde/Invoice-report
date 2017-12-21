@@ -1,0 +1,10 @@
+GET:
+  /path: 'pathController:indexAction'
+  /path/{to}/resource: 'pathController:resourceAction'
+  /: 'pathController:indexAction'
+POST:
+  /path/to/resource: 'controllerClass:method'
+  /path/{to}/resource: 'controllerClass:method'
+DELETE:
+  /path/to/resource: 'controllerClass:method'
+  /path/{to}/resource: 'controllerClass:method'

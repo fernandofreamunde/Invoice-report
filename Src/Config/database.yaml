@@ -1,0 +1,6 @@
+
+database:
+  host: localhost
+  database: invoice
+  user: root
+  secret: pw

@@ -8,6 +8,11 @@ namespace App\Core;
 class Router
 {
     private $routes;
+    private $requestMethod;
+    private $uri;
+    private $controller;
+    private $action;
+    private $params;
 
     function __construct(Array $routes)
     {
@@ -16,75 +21,115 @@ class Router
 
         $this->requestMethod = $_SERVER['REQUEST_METHOD'];
         $this->uri           = $_SERVER['REQUEST_URI'];
+        $this->params        = [];
 
-/*        $content = file_get_contents("php://input");
-        var_dump($content);die;*/
+        $this->initialize();
+
+        /*        
+        $content = file_get_contents("php://input");
+        var_dump($content);die;
+        */
     }
 
-    public function getTarget()
+    public function initialize()
     {
         if (isset($this->routes[$this->requestMethod][$this->uri])) {
-            
-            return $this->getParams();
+            // if an exact match exists between existing routes and the URI, just get the controller and Method 
+            return $this->getTargetControllerWithParams($this->routes[$this->requestMethod][$this->uri]);
         }
 
+        $explodedUri = explode('/', ltrim($this->uri, '/'));
         foreach ($this->routes[$this->requestMethod] as $route => $classMethod) {
-
-            $explodedUri = explode('/', ltrim($this->uri, '/'));
             $explodedRoute = explode('/', ltrim($route, '/'));
 
-            $levelDiferences = [];
-            for ($i=0; $i < count($explodedUri); $i++) { 
+            // if the current route has a different number of
+            // elements than the target route just skip it
+            if (count($explodedRoute) !== count($explodedUri)) {
+                continue;
+            }
 
-                if (!isset($explodedRoute[$i])) {
-                    continue;
-                }
-                
-                if ($explodedUri[$i] != $explodedRoute[$i]) {
-                    # code...
-                    if ($i === 0) {
-                        continue;
+            preg_match_all('/{.*}/U', $route, $params);
+
+            $paramPositionMaping = [];
+
+            if (count($params[0]) != 0) {
+
+                foreach ($params[0] as $param) {
+
+                    foreach ($explodedRoute as $key => $value) {
+
+                        if ($value == $param) {
+                            $paramPositionMaping[$key] = $param; 
+                        }
                     }
-                    echo "LEVEL $i IS DIFFERENT <br>";
-                    $levelDiferences[] = $i;
                 }
             }
-            echo "<pre>",var_dump($levelDiferences),"</pre><br>";
 
-            echo "<pre>",var_dump(ltrim($this->uri, '/')),"</pre>";
-            echo "<pre>",var_dump($explodedUri),"</pre>";
-            echo "<pre>",var_dump($route),"</pre>";
-            echo "<pre>",var_dump($classMethod),"</pre>";
+            // Replace the mapped params with the values of the current uri
+            $virtualRoute = $explodedRoute;
+            $paramsToPass = [];
+            foreach ($paramPositionMaping as $key => $value) {
+                $virtualRoute[$key] = $explodedUri[$key];
+                $paramsToPass[$value] = $explodedUri[$key];
+            }
 
-            echo '---------------------------------------';
+            // create a virtual route
+            $virtualRoute = '/'.implode('/',$virtualRoute);
+
+            // if the virtual route matches the URI we have a winner!
+            if ($this->uri == $virtualRoute) {
+                return $this->getTargetControllerWithParams(
+                        $this->routes[$this->requestMethod][$route], 
+                        $paramsToPass
+                    );
+            }
         }
 
         $this->uri = '/';
-        #return $this->getParams();
+        return $this->getTargetControllerWithParams($this->routes[$this->requestMethod][$this->uri]);
         echo 'get target fun';
-        # code...
     }
 
 
-    private function getParams()
+    private function getTargetControllerWithParams(string $target, $routeParams = null)
     {
-        $target = explode(':', $this->routes[$this->requestMethod][$this->uri]);
+        $target = explode(':', $target);
+        $this->controller = 'App\Controller\\'.$target[0];
+        $this->action = $target[1];
 
-        $r = new \ReflectionMethod('App\Controller\\'.$target[0], $target[1]);
-        $params = $r->getParameters();
+        $reflection = new \ReflectionMethod($this->controller, $this->action);
 
-        /*if (!empty($params)) {
+        if ($routeParams !== null) {
 
-            foreach ($params as $param) {
-                //$param is an instance of ReflectionParameter
-                echo $param->getName();
-                echo $param->isOptional();
+            $reflectionParams = $reflection->getParameters();
+
+            $params = [];
+            if (!empty($reflectionParams)) {
+
+                foreach ($reflectionParams as $reflectionParam) {
+                    $params[$reflectionParam->getName()] = $routeParams['{'.$reflectionParam->getName().'}'];
+                    //echo $reflectionParam->getName();
+                    //echo $reflectionParam->isOptional();
+                }
             }
-        }*/
 
-        return ['target' => $r, 'params' => $params];
+            $this->params = $params;
+        }
 
-        echo '<pre>', print_r($r),'</pre>';
-        echo '<pre>', print_r($params),'</pre>';
+    }
+
+    public function getController()
+    {
+        return $this->controller;
+    }
+
+    public function getAction()
+    {
+        return $this->action;
+    }
+
+    public function getParams()
+    {
+        return $this->params;
     }
 }

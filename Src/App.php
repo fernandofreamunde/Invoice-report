@@ -20,18 +20,16 @@ class App
     
     public function run()
     {
+        // Sorry I didn't code this file my self
+        // got it from http://www.php-fig.org/psr/psr-4/examples/
         require_once 'Core/Psr4Autoloader.php';
-        #use App\Connection\Database;
-        //echo getcwd();die;
         $loader = new \App\Core\Psr4Autoloader;
         $loader->register();
         $loader->addNamespace('App', '../Src');
 
         $router = new Router($this->configuration['router']);
 
-        $targetWithParams = $router->getTarget();
-
-        $this->call($targetWithParams['target'], $targetWithParams['params']);
+        $this->call($router->getController(), $router->getAction(), $router->getParams());
 
         $con = new \App\Core\Database($this->configuration['database']);
         #$con->connect();
@@ -56,11 +54,10 @@ class App
         }
     }
 
-    private function call($target, $params)
+    private function call($controller, $action, $params)
     {
-        echo '<pre>', print_r($target),'</pre>';
-        echo '<pre>', print_r($params),'</pre>';
-        # code...
+        $controller = new $controller;
+        call_user_func_array([$controller, $action], $params);
     }
 }
 

@@ -14,6 +14,8 @@ class Router
     private $action;
     private $params;
 
+    const CONTROLLER_FOLDER = 'App\AppPacket\Controller\\';
+
     function __construct(Array $routes)
     {
 
@@ -94,28 +96,31 @@ class Router
     private function getTargetControllerWithParams(string $target, $routeParams = null)
     {
         $target = explode(':', $target);
-        $this->controller = 'App\Controller\\'.$target[0];
+        $this->controller = self::CONTROLLER_FOLDER.$target[0];
         $this->action = $target[1];
 
         $reflection = new \ReflectionMethod($this->controller, $this->action);
 
-        if ($routeParams !== null) {
+        $reflectionParams = $reflection->getParameters();
 
-            $reflectionParams = $reflection->getParameters();
+        $params = [];
+        if (!empty($reflectionParams)) {
+            foreach ($reflectionParams as $reflectionParam) {
 
-            $params = [];
-            if (!empty($reflectionParams)) {
+                $class = $reflectionParam->getClass();
 
-                foreach ($reflectionParams as $reflectionParam) {
-                    $params[$reflectionParam->getName()] = $routeParams['{'.$reflectionParam->getName().'}'];
-                    //echo $reflectionParam->getName();
-                    //echo $reflectionParam->isOptional();
+                if (!empty($class)) {
+                    $params[$reflectionParam->getName()] = $class->getName();
                 }
+                else {
+                    $params[$reflectionParam->getName()] = $routeParams['{'.$reflectionParam->getName().'}'];
+                }
+                #echo $reflectionParam->getName();
+                #echo $reflectionParam->isOptional();
             }
-
-            $this->params = $params;
         }
 
+        $this->params = $params;
     }
 
     public function getController()

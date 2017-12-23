@@ -29,7 +29,10 @@ class App
 
         $router = new Router($this->configuration['router']);
 
-        $this->call($router->getController(), $router->getAction(), $router->getParams());
+        $this->call(
+            $router->getController(), 
+            $router->getAction(), 
+            $router->getParams());
 
         $con = new \App\Core\Database($this->configuration['database']);
         #$con->connect();
@@ -57,6 +60,11 @@ class App
     private function call($controller, $action, $params)
     {
         $controller = new $controller;
+
+        foreach ($params as $param => $value) {
+            $params[$param] = class_exists($value) ? new $value: $value;
+        }
+
         call_user_func_array([$controller, $action], $params);
     }
 }

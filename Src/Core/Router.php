@@ -10,11 +10,8 @@ class Router
     private $routes;
     private $requestMethod;
     private $uri;
-    private $controller;
-    private $action;
+    private $target;
     private $params;
-
-    const CONTROLLER_FOLDER = 'App\AppPacket\Controller\\';
 
     function __construct(Array $routes)
     {
@@ -23,9 +20,7 @@ class Router
 
         $this->requestMethod = $_SERVER['REQUEST_METHOD'];
         $this->uri           = $_SERVER['REQUEST_URI'];
-        $this->params        = [];
-
-        $this->initialize();
+        $this->target        = $this->getTargetAndSetParams();
 
         /*        
         $content = file_get_contents("php://input");
@@ -33,12 +28,15 @@ class Router
         */
     }
 
-    public function initialize()
+    private function getTargetAndSetParams()
     {
         if (isset($this->routes[$this->requestMethod][$this->uri])) {
-            // if an exact match exists between existing routes and the URI, just get the controller and Method 
-            return $this->getTargetControllerWithParams($this->routes[$this->requestMethod][$this->uri]);
+            // if an exact match exists between existing routes and the URI, just set the target
+            return $this->routes[$this->requestMethod][$this->uri];
         }
+
+        // If we got here this means either that the route does not exist 
+        // or it has paramters
 
         $explodedUri = explode('/', ltrim($this->uri, '/'));
         foreach ($this->routes[$this->requestMethod] as $route => $classMethod) {
@@ -50,10 +48,10 @@ class Router
                 continue;
             }
 
+            // search for params in the route
             preg_match_all('/{.*}/U', $route, $params);
 
             $paramPositionMaping = [];
-
             if (count($params[0]) != 0) {
 
                 foreach ($params[0] as $param) {
@@ -80,57 +78,21 @@ class Router
 
             // if the virtual route matches the URI we have a winner!
             if ($this->uri == $virtualRoute) {
-                return $this->getTargetControllerWithParams(
-                        $this->routes[$this->requestMethod][$route], 
-                        $paramsToPass
-                    );
+
+                // therefore set the route paramters and return the target
+                $this->params = $paramsToPass;
+                return $this->routes[$this->requestMethod][$route];
             }
         }
 
+        // if a corresponding route is not found just return the index
         $this->uri = '/';
-        return $this->getTargetControllerWithParams($this->routes[$this->requestMethod][$this->uri]);
-        echo 'get target fun';
+        return $this->routes[$this->requestMethod][$this->uri];
     }
 
-
-    private function getTargetControllerWithParams(string $target, $routeParams = null)
+    public function getTarget()
     {
-        $target = explode(':', $target);
-        $this->controller = self::CONTROLLER_FOLDER.$target[0];
-        $this->action = $target[1];
-
-        $reflection = new \ReflectionMethod($this->controller, $this->action);
-
-        $reflectionParams = $reflection->getParameters();
-
-        $params = [];
-        if (!empty($reflectionParams)) {
-            foreach ($reflectionParams as $reflectionParam) {
-
-                $class = $reflectionParam->getClass();
-
-                if (!empty($class)) {
-                    $params[$reflectionParam->getName()] = $class->getName();
-                }
-                else {
-                    $params[$reflectionParam->getName()] = $routeParams['{'.$reflectionParam->getName().'}'];
-                }
-                #echo $reflectionParam->getName();
-                #echo $reflectionParam->isOptional();
-            }
-        }
-
-        $this->params = $params;
-    }
-
-    public function getController()
-    {
-        return $this->controller;
-    }
-
-    public function getAction()
-    {
-        return $this->action;
+        return $this->target;
     }
 
     public function getParams()

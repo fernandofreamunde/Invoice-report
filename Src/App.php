@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Core\Router;
+use App\Core\Configuration;
 use App\Core\Psr4Autoloader;
 use App\Core\DependencyInjection;
 
@@ -11,14 +12,7 @@ use App\Core\DependencyInjection;
 */
 class App
 {
-    const CONFIGURATION_DIR = __dir__.'/Config/';
-    
-    private $configuration = [];
-
-    public function __construct()
-    {
-        $this->getConfiguration();
-    }
+    private $configuration;
     
     public function run()
     {
@@ -29,35 +23,18 @@ class App
         $loader->register();
         $loader->addNamespace('App', '../Src');
 
-        $route = new Router($this->configuration['router']);
+        $this->configuration = new Configuration;
+
+        $route = new Router($this->configuration->get('router'));
         $di    = new DependencyInjection($route);
 
-        #echo '<pre>',print_r($route),'</pre>';
-
+        #$con = new \App\Core\Database($this->configuration['database']);
         $this->call(
             $di->getController(), 
             $di->getAction(), 
             $di->getParameters());
 
-        #$con = new \App\Core\Database($this->configuration['database']);
         #$con->connect();
-    }
-
-    private function getConfiguration()
-    {
-        $configs = glob(self::CONFIGURATION_DIR . "*.yaml");
-
-        foreach($configs as $path)
-        {
-            // get file name
-            $filename = str_replace(self::CONFIGURATION_DIR, '', $path);
-
-            // remove extension
-            $configurationType = explode('.', $filename)[0];
-
-            // save the content in property
-            $this->configuration[$configurationType] = yaml_parse_file($path);
-        }
     }
 
     private function call($controller, $action, $params)

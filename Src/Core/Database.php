@@ -1,21 +1,37 @@
 <?php
 namespace App\Core;
+use App\Core\Configuration;
+use \PDO as Pdo;
 
 /**
 * 
 */
 class Database
 {
-    private $host;
-    private $dbname;
-    private $user;
-    private $secret;
+    protected $connection;
+    const WHITELISTED = [
+        'invoices',
+        'invoice_items',
+    ];
 
-    private $connection;
-
-    public function __construct(Array $config)
+    public function __construct(Configuration $configuration)
     {
-        $this->connection = new \PDO('mysql:host='.$config['database']['host'].';dbname='.$config['database']['database'], $config['database']['user'], $config['database']['secret']);
+        $config = $configuration->get('database');
+        $this->connection = new Pdo('mysql:host='.$config['host'].';dbname='.$config['database'], $config['user'], $config['secret']);
     }
-    
+
+    public function getAllFromTable($table)
+    {
+        
+        $table = in_array($table, self::WHITELISTED) ? $table: false;
+
+        if (!$table) {
+            die('ERROR');
+        }
+
+        $stmt = $this->connection->prepare("SELECT * FROM ".$table);
+        $stmt->execute();
+
+        return $stmt->fetchAll(Pdo::FETCH_ASSOC);
+    }
 }

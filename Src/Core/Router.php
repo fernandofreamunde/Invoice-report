@@ -37,7 +37,6 @@ class Router
 
         // If we got here this means either that the route does not exist 
         // or it has paramters
-
         $explodedUri = explode('/', ltrim($this->uri, '/'));
         foreach ($this->routes[$this->requestMethod] as $route => $classMethod) {
             $explodedRoute = explode('/', ltrim($route, '/'));

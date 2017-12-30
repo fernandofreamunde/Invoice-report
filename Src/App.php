@@ -28,13 +28,10 @@ class App
         $route = new Router($this->configuration->get('router'));
         $di    = new DependencyInjection($route);
 
-        #$con = new \App\Core\Database($this->configuration['database']);
         $this->call(
             $di->getController(), 
             $di->getAction(), 
             $di->getParameters());
-
-        #$con->connect();
     }
 
     private function call($controller, $action, $params)

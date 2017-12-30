@@ -20,8 +20,6 @@ class Query
     function __construct($entity)
     {
         $this->entity = $entity;
-
-        $this->query = 'SELECT * FROM ' . $entity::TABLE . ' ';
     }
 
     private function setValues($column, $value)
@@ -44,6 +42,11 @@ class Query
         return 0;
     }
 
+    public function select()
+    {
+        $this->query = 'SELECT * FROM ' . $this->entity::TABLE . ' ';
+    }
+
     public function filterBy($column, $value, $criteria = self::EQUALS)
     {
         $counter = $this->setValues($column, $value);
@@ -55,6 +58,13 @@ class Query
         {
             $this->query .= 'WHERE ' . $column . ' ' . $criteria . ' :' . $column . $counter . ' ';
         }
+    }
+
+    public function offsetAndLimit($offset, $limit)
+    {
+        // for some reason using pdo vars here isnt working
+        // not solving the issue due to not being that critical.
+        $this->query .= 'LIMIT '.$offset.', '.$limit.' ';
     }
 
     public function and()

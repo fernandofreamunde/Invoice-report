@@ -38,6 +38,7 @@ class Database
                 
                 $relationReflectionProp = $relationReflection->getProperty('id');
                 $relationReflectionProp->setAccessible(true);
+                
                 //because entities should not have paramters we pass an enpty array
                 $obj = $relationReflection->newInstanceArgs([]);
 
@@ -60,21 +61,6 @@ class Database
             $objects[] = $this->rowToObject($row, $entity);
         }
         return $objects;
-    }
-
-    public function getAllFromTable($table)
-    {
-        
-        $table = in_array($table, self::WHITELISTED) ? $table: false;
-
-        if (!$table) {
-            die('ERROR');
-        }
-
-        $stmt = $this->connection->prepare("SELECT * FROM ".$table);
-        $stmt->execute();
-
-        return $stmt->fetchAll(Pdo::FETCH_ASSOC);
     }
 
     public function runQuery(Query $query)

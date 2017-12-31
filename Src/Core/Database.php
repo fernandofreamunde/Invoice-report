@@ -11,10 +11,6 @@ use \PDO as Pdo;
 class Database
 {
     protected $connection;
-    const WHITELISTED = [
-        'invoices',
-        'invoice_items',
-    ];
 
     public function __construct(Configuration $configuration)
     {
@@ -38,7 +34,7 @@ class Database
                 
                 $relationReflectionProp = $relationReflection->getProperty('id');
                 $relationReflectionProp->setAccessible(true);
-                
+
                 //because entities should not have paramters we pass an enpty array
                 $obj = $relationReflection->newInstanceArgs([]);
 
@@ -47,7 +43,6 @@ class Database
 
             }
 
-            #$reflectionProp = $reflection->getProperty($column);
             $reflectionProp->setValue($entity, $value);
         }
 

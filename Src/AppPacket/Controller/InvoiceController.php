@@ -2,11 +2,19 @@
 
 namespace App\AppPacket\Controller;
 
+use App\AppPacket\Service\InvoiceService;
 /**
 * 
 */
 class InvoiceController
 {
+    private $invoiceService;
+
+    public function __construct(InvoiceService $invoiceService)
+    {
+        $this->invoiceService = $invoiceService;
+    }
+    
     public function indexAction()
     {
         # paginated resource max 5 per page
@@ -26,5 +34,7 @@ class InvoiceController
     {
         # Export the transactions as a CSV file. The export should be in the following format:
         # Invoice ID | Company Name | Invoice Amount
+
+        $this->invoiceService->transactionsReport();
     }
 }

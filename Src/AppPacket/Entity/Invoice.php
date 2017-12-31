@@ -22,42 +22,42 @@ class Invoice
 
     public function getId()
     {
-        return $id;
+        return $this->id;
     }
 
     public function getClient()
     {
-        return $client;
+        return $this->client;
     }
 
     public function getAmountWithoutTax()
     {
-        return $invoice_amount;
+        return $this->invoice_amount;
     }
 
     public function getAmountWithTax()
     {
-        return $invoice_amount_plus_vat;
+        return $this->invoice_amount_plus_vat;
     }
 
     public function getTaxRate()
     {
-        return $vat_rate;
+        return $this->vat_rate;
     }
 
     public function getStatus()
     {
-        return $invoice_status;
+        return $this->invoice_status;
     }
 
     public function getDate()
     {
-        return $invoice_date;
+        return $this->invoice_date;
     }
 
     public function getCreatedAt()
     {
-        return $created_at;
+        return $this->created_at;
     }
 
     public function setStatus()

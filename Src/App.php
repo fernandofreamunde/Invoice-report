@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Core\Router;
+use App\Core\Response;
 use App\Core\Configuration;
 use App\Core\Psr4Autoloader;
 use App\Core\DependencyInjection;
@@ -28,14 +29,16 @@ class App
         $route = new Router($this->configuration->get('router'));
         $di    = new DependencyInjection($route);
 
-        $this->call(
+        $response = $this->call(
             $di->getController(), 
             $di->getAction(), 
             $di->getParameters());
+        
+        $response->render();
     }
 
     private function call($controller, $action, $params)
     {
-        call_user_func_array([$controller, $action], $params);
+        return call_user_func_array([$controller, $action], $params);
     }
 }

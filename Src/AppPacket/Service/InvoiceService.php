@@ -21,19 +21,21 @@ class InvoiceService
     {
         $invoices = $this->invoiceRepository->getAll();
 
-        ///// this logic needs to be moved to a view class of some sorts
-        $text = "Invoice ID,Company Name,Invoice Amount\n";
+        $content[] = [
+            'Invoice ID', 
+            'Company Name', 
+            'Invoice Amount',
+        ];
 
         foreach ($invoices as $invoice) {
-            $text .= $invoice->getId().','.$invoice->getClient().','.$invoice->getAmountWithoutTax()."\n";
+            $content[] = [
+                $invoice->getId(),
+                $invoice->getClient(),
+                $invoice->getAmountWithoutTax(),
+            ];
         }
 
-        header('Content-Type: text/csv');
-        header('Content-Disposition: attachment; filename="transactions_report.csv"');
-        $handle = fopen('php://output', 'w');
-        fwrite($handle, $text);
-        // all needed here is to return the data as array. look at fputcsv for reference
-        #echo '<pre>',print_r($text),'</pre>';
+        return $content;
     }
 
     public function customerReport()
@@ -59,20 +61,24 @@ class InvoiceService
             ];
         }
 
-        ///// this logic needs to be moved to a view class of some sorts
-        //Company Name | Total Invoiced Amount | Total Amount Paid | Total Amount Outstanding
-        $text = "Company Name,Total Invoiced Amount,Total Amount Paid,Total Amount Outstanding\n";
+        $content[] = [
+            'Company Name',
+            'Total Invoiced Amount',
+            'Total Amount Paid',
+            'Total Amount Outstanding',
+            ];
 
         foreach ($data as $customer => $reportData) {
 
             /////////////////////////////////////////////////////////////////// FORMAT VALUES TO MONEY
-            $text .= $customer.','.$reportData['total'].','.$reportData['paid'].','.$reportData['unpaid']."\n";
+            $content[] = [
+                $customer,
+                $reportData['total'],
+                $reportData['paid'],
+                $reportData['unpaid'],
+                ];
         }
 
-        header('Content-Type: text/csv');
-        header('Content-Disposition: attachment; filename="customer_report.csv"');
-        $handle = fopen('php://output', 'w');
-        fwrite($handle, $text);
-        // all needed here is to return the data as array. look at fputcsv for reference
+        return $content;
     }
 }

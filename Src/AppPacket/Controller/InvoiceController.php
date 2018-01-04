@@ -3,6 +3,9 @@
 namespace App\AppPacket\Controller;
 
 use App\AppPacket\Service\InvoiceService;
+use App\Core\Response;
+use App\Core\View;
+
 /**
 * 
 */
@@ -17,6 +20,7 @@ class InvoiceController
     
     public function indexAction()
     {
+        return new View;
         # paginated resource max 5 per page
     }
 
@@ -35,6 +39,8 @@ class InvoiceController
         # Export the transactions as a CSV file. The export should be in the following format:
         # Invoice ID | Company Name | Invoice Amount
 
-        $this->invoiceService->transactionsReport();
+        $content = $this->invoiceService->transactionsReport();
+
+        return new Response($content, Response::TYPE_CSV);
     }
 }

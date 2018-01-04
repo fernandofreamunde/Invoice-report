@@ -3,6 +3,7 @@
 namespace App\AppPacket\Controller;
 
 use App\AppPacket\Service\InvoiceService;
+use App\Core\Response;
 
 /**
 * 
@@ -21,6 +22,8 @@ class CustomerController
         # Export a CSV customer report. The export should be in the following format:
         # Company Name | Total Invoiced Amount | Total Amount Paid | Total Amount Outstanding
 
-        $this->invoiceService->customerReport();
+        $content = $this->invoiceService->customerReport();
+
+        return new Response($content, Response::TYPE_CSV);
     }
 }

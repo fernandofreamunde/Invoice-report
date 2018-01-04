@@ -1,5 +1,5 @@
 GET:
-  /: 'pathController:indexAction'
+  /: 'InvoiceController:indexAction'
   /path: 'pathController:indexAction'
   /path/{to}/resource: 'pathController:resourceAction'
   /path/{to}/resource/{with}/more/{params}: 'pathController:resourceAction'

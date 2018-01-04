@@ -18,10 +18,8 @@ class Configuration
             // get file name
             $filename = str_replace(self::CONFIGURATION_DIR, '', $path);
 
-            // remove extension
             $configurationType = explode('.', $filename)[0];
 
-            // save the content in property
             $this->configuration[$configurationType] = yaml_parse_file($path);
         }
     }

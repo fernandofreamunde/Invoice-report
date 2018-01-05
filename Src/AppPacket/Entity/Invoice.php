@@ -8,6 +8,7 @@ namespace App\AppPacket\Entity;
 class Invoice 
 {
     const TABLE = 'invoices';
+    const VALID_STATUS = ['paid','unpaid'];
     public function __construct()
     {}
 
@@ -60,8 +61,11 @@ class Invoice
         return $this->created_at;
     }
 
-    public function setStatus()
+    public function setStatus($newStatus)
     {
-        $this->status = $invoice_status;
+        if (in_array($newStatus, self::VALID_STATUS)) {
+
+            $this->invoice_status = $newStatus;
+        }
     }
 }

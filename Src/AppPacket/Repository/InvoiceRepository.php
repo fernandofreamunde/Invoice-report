@@ -42,6 +42,15 @@ class InvoiceRepository
         return $this->db->runQuery($query);
     }
 
+    public function getInvoiceById($id)
+    {
+        $query = $this->getQuery();
+        $query->select();
+        $query->filterBy('id', $id);
+
+        return $this->db->runQuery($query);
+    }
+
     private function getQuery()
     {
         return new Query($this->entity);

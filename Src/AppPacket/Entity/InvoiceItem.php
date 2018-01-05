@@ -19,26 +19,26 @@ class InvoiceItem
 
     public function getId()
     {
-        return $id;
+        return $this->id;
     }
 
     public function getInvoiceId()
     {
-        return $invoice_id;
+        return $this->invoice_id;
     }
 
     public function getName()
     {
-        return $name;
+        return $this->name;
     }
 
     public function getAmount()
     {
-        return $amount;
+        return $this->amount;
     }
 
     public function getCreatedAt()
     {
-        return $created_at;
+        return $this->created_at;
     }
 }

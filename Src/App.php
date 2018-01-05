@@ -33,7 +33,10 @@ class App
             $di->getController(), 
             $di->getAction(), 
             $di->getParameters());
-        
+
+        // This can be a View or a Response Object, not what I wanted initially
+        // but since both have the render method and it works as is, will leave like this
+        // Would be something to refactor on a later stage
         $response->render();
     }
 

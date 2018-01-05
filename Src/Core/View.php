@@ -18,8 +18,6 @@ class View
 
 
         $this->data = $data;
-
-       # $this->parse($view);
     }
 
 
@@ -34,7 +32,7 @@ class View
         if ($layout && $placement) {
             $this->data[$placement] = $this->renderFile($this->view);
         }
-        #echo "<pre>";var_dump($$placement);
+
         echo $this->renderFile($layout);
 
     }

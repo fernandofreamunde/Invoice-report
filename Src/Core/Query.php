@@ -47,6 +47,12 @@ class Query
         $this->query = 'SELECT * FROM ' . $this->entity::TABLE . ' ';
     }
 
+    public function customWrightAction($query, $values)
+    {
+        $this->query = $query;
+        $this->values = $values;
+    }
+
     public function filterBy($column, $value, $criteria = self::EQUALS)
     {
         $counter = $this->setValues($column, $value);

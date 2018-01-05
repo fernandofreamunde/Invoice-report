@@ -68,4 +68,11 @@ class Database
         return $this->toArrayOfObjects($result, $query->getEntity());
     }
 
+    public function runWrightQuery(Query $query)
+    {
+        $stmt = $this->connection->prepare($query->getQuery());
+        $stmt->execute($query->getValues());
+        return  $stmt->rowCount();
+    }
+
 }

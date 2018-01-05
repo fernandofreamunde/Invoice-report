@@ -1,14 +1,7 @@
 GET:
   /: 'InvoiceController:indexAction'
-  /path: 'pathController:indexAction'
-  /path/{to}/resource: 'pathController:resourceAction'
-  /path/{to}/resource/{with}/more/{params}: 'pathController:resourceAction'
-  /path/to/resource: 'pathController:serviceNeededAction'
+  /invoice/{id}: 'InvoiceController:detailAction'
   /invoice/report: 'InvoiceController:reportAction'
   /customer/report: 'CustomerController:reportAction'
 POST:
-  /path/to/resource: 'controllerClass:method'
-  /path/{to}/resource: 'controllerClass:method'
-DELETE:
-  /path/to/resource: 'controllerClass:method'
-  /path/{to}/resource: 'controllerClass:method'
+  /invoice/{id}/status: 'InvoiceController:statusAction'

@@ -21,11 +21,6 @@ class Router
         $this->requestMethod = $_SERVER['REQUEST_METHOD'];
         $this->uri           = $_SERVER['REQUEST_URI'];
         $this->target        = $this->getTargetAndSetParams();
-
-        /*        
-        $content = file_get_contents("php://input");
-        var_dump($content);die;
-        */
     }
 
     private function getTargetAndSetParams()

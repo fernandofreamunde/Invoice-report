@@ -34,8 +34,7 @@ class Response
                 break;
 
             case self::TYPE_JSON:
-                #$this->renderDownloadCsv();
-                die('json');
+                $this->renderJson();
                 break;
             
             default:
@@ -66,5 +65,12 @@ class Response
         }
 
         fclose($file);
+    }
+
+    private function renderJson()
+    {
+        header('Content-Type: '.$this->type);
+
+        echo json_encode($this->content);
     }
 }

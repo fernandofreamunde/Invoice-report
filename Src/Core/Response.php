@@ -45,13 +45,13 @@ class Response
 
     private function renderHtml() // TODO : add content as param and typehint as VIEW
     {
-        $menu = $this->content;
+        /*$menu = $this->content;
         $content = $this->content;
         ob_start();
         include __dir__.'/../AppPacket/Views/layout.php';
         $renderedView = ob_get_clean();
 
-        echo $renderedView;
+        echo $renderedView;*/
     }
 
     private function renderDownloadCsv()

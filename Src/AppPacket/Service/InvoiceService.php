@@ -2,8 +2,10 @@
 
 namespace App\AppPacket\Service;
 
-use App\AppPacket\Repository\InvoiceRepository;
+use App\Core\Query;
+use App\Core\Database;
 use App\AppPacket\Entity\Invoice;
+use App\AppPacket\Repository\InvoiceRepository;
 
 /**
 * 
@@ -11,10 +13,50 @@ use App\AppPacket\Entity\Invoice;
 class InvoiceService
 {
     private $invoiceRepository;
+    private $db;
     
-    function __construct(InvoiceRepository $invoiceRepo)
+    function __construct(InvoiceRepository $invoiceRepository, Database $db)
     {
-        $this->invoiceRepository = $invoiceRepo;
+        $this->invoiceRepository = $invoiceRepository;
+        $this->db = $db;
+    }
+
+    public function getOneById($id)
+    {
+        return $this->invoiceRepository->getInvoiceById($id);
+    }
+
+    public function setInvoiceStatusById($id, $status)
+    {
+        $invoice = $this->invoiceRepository->getInvoiceById($id);
+        $invoice[0]->setStatus($status);
+
+        $updateQuery = 'UPDATE invoices SET 
+        invoice_status = ?
+        WHERE id = ?';
+
+        $params = [
+        $invoice[0]->getStatus(),
+        $invoice[0]->getId(),
+        ];
+
+        $query = new Query($invoice[0]);
+        $query->customWrightAction($updateQuery, $params);
+
+        $this->db->runWrightQuery($query);
+
+        return $invoice[0];
+    }
+
+    public function getInvoicesPaginated($page = 1)
+    {
+        return $this->invoiceRepository->getAllPaginated($page);
+    }
+
+    public function getInvoicePageCount()
+    {
+        // this could be a query with a count but no time...
+        return ceil(count($this->invoiceRepository->getAll())/InvoiceRepository::ITEMS_PER_PAGE);
     }
 
     public function transactionsReport()
@@ -70,7 +112,6 @@ class InvoiceService
 
         foreach ($data as $customer => $reportData) {
 
-            /////////////////////////////////////////////////////////////////// FORMAT VALUES TO MONEY
             $content[] = [
                 $customer,
                 $reportData['total'],
